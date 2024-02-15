@@ -1,0 +1,236 @@
+//activity_main
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="#60AAE4"
+    android:padding="25dp"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <TextView
+        android:id="@+id/total_questions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TotalQuestions"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:textColor="#EEE0F1"
+        android:textSize="30dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/questions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="This is the question"
+        android:layout_marginTop="150dp"
+        android:textColor="#FFEB3B"
+        android:textSize="24dp"
+        android:layout_above="@+id/Choices_layout"
+        android:textStyle="bold"
+        tools:ignore="UnknownId" />
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bestChoice"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+        
+        <Button
+            android:id="@+id/ans_a"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="Ans A"
+            android:textColor="@color/black"
+            android:textSize="24dp"/>
+
+        <Button
+            android:id="@+id/ans_b"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="Ans B"
+            android:textColor="@color/black"
+            android:textSize="24dp"/>
+
+        <Button
+            android:id="@+id/ans_c"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="Ans C"
+            android:textColor="@color/black"
+            android:textSize="24dp"/>
+
+        <Button
+            android:id="@+id/ans_d"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:text="Ans D"
+            android:textColor="@color/black"
+            android:textSize="24dp"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#E91E63"
+        android:text="Submit"
+        android:layout_below="@+id/bestChoice"
+        android:textColor="#121111"
+        android:textSize="24dp"/>
+</RelativeLayout>
+
+//MainActivity.java
+
+package com.example.quizapp;
+
+import android.app.AlertDialog;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    TextView questionsTextView;
+    TextView totalquestionTextView;
+    Button ansA,ansB,ansC,ansD;
+    Button submit;
+
+    int score=0;
+    int totalQuestions= QuestionAnswer.questions.length;
+    int currentQuestionIndex =0;
+    String selectedAnswer="";
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        totalquestionTextView = findViewById(R.id.total_questions);
+        questionsTextView = findViewById(R.id.questions);
+        ansA = findViewById(R.id.ans_a);
+        ansB = findViewById(R.id.ans_b);
+        ansC = findViewById(R.id.ans_c);
+        ansD = findViewById(R.id.ans_d);
+        submit = findViewById(R.id.submit);
+
+        ansA.setOnClickListener(this);
+        ansB.setOnClickListener(this);
+        ansC.setOnClickListener(this);
+        ansD.setOnClickListener(this);
+        submit.setOnClickListener(this);
+
+        totalquestionTextView.setText("Total Question: "+ totalQuestions);
+
+        loadNewQuestion();
+    }
+
+    private void loadNewQuestion(){
+        if(currentQuestionIndex == totalQuestions){
+            finishQuiz();
+            return;
+        }
+        questionsTextView.setText(QuestionAnswer.questions[currentQuestionIndex]);
+        ansA.setText(QuestionAnswer.choices[currentQuestionIndex][0]);
+        ansB.setText(QuestionAnswer.choices[currentQuestionIndex][1]);
+        ansC.setText(QuestionAnswer.choices[currentQuestionIndex][2]);
+        ansD.setText(QuestionAnswer.choices[currentQuestionIndex][3]);
+
+        selectedAnswer = " ";
+    }
+
+    private void finishQuiz(){
+        String passStatus;
+        if(score >= totalQuestions*0.6){
+            passStatus = "Passed";
+        }
+        else{
+            passStatus = "Failed";
+        }
+        new AlertDialog.Builder(this)
+                .setTitle(passStatus)
+                .setMessage("Your score is "+score+" Out of "+totalQuestions)
+                .setPositiveButton("Restart",((dialog, i) -> restartQuiz() ))
+                .setCancelable(false)
+                .show();
+    }
+
+    private void restartQuiz(){
+        score=0;
+        currentQuestionIndex=0;
+        loadNewQuestion();
+    }
+
+    @Override
+    public void onClick(View view){
+        ansA.setBackgroundColor(Color.WHITE);
+        ansB.setBackgroundColor(Color.WHITE);
+        ansC.setBackgroundColor(Color.WHITE);
+        ansD.setBackgroundColor(Color.WHITE);
+
+        Button clickedButton = (Button) view;
+
+        if(clickedButton.getId() == R.id.submit) {
+            if(!selectedAnswer.isEmpty()) {
+                if(selectedAnswer.equals(QuestionAnswer.correctAnswers[currentQuestionIndex])) {
+                    score++;
+                }
+                else {
+                    clickedButton.setBackgroundColor(Color.MAGENTA);
+                }
+                currentQuestionIndex++;
+                loadNewQuestion();
+            }
+            else {
+
+            }
+        } else {
+            selectedAnswer = clickedButton.getTag().toString();
+            clickedButton.setBackgroundColor(Color.YELLOW);
+        }
+    }
+}
+
+//QuestionAnswer.java
+
+package com.example.quizapp;
+
+public class QuestionAnswer {
+    public static String questions []={
+            "What was the original name of Google before it was changed?",
+            "Which artist famously interrupted Taylor Swift's acceptance speech at the 2009 MTV Video Music Awards?",
+            "What is the main ingredient in traditional hummus?",
+            "Who painted the famous artwork Starry Night ?",
+            "In which sport would you perform an ollie ?"
+    };
+
+    public static String choices [][]={
+            {"Googol","Backrub","Webcrawler","SearchMaster"},
+            {"Kanye West","Justin Bieber","Jay-Z","Drake"},
+            {"Chickpeas","Lentils","Black beans","Quinoa"},
+            {"Vincent van Gogh","Pablo Picasso","Leonardo da Vinci","Claude Monet"},
+            {"Skateboarding","Soccer","Tennis","Swimming"}
+    };
+
+    public static String correctAnswers []={
+            "Backrub",
+            "Kanye West",
+            "Chickpeas",
+            "Vincent van Gogh",
+            "Skateboarding"
+    };
+}
