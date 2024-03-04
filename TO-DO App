@@ -1,0 +1,189 @@
+//activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="247dp"
+        android:layout_height="135dp"
+        android:layout_centerInParent="true"
+        android:text="To Do List App: Keep Trak of all your tasks"
+        android:textColor="#E6081A"
+        android:textFontWeight="1000"
+        android:textSize="32dp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:text="Add"
+        android:textSize="32dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="80dp"
+        android:scrollbars="none">
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+    </ScrollView>
+</RelativeLayout>
+
+//MainActivity.java
+
+package com.example.todolistapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import androidx.appcompat.app.AlertDialog;
+import android.content.DialogInterface;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+    Button add;
+    AlertDialog dialog;
+    LinearLayout layout;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        add=findViewById(R.id.add);
+        layout=findViewById(R.id.container);
+
+        buildDialog();
+        add.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                dialog.show();
+            }
+        });
+
+    }
+    public void buildDialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog, null);
+
+
+        final EditText name= view.findViewById(R.id.nameEdit);
+
+        builder.setView(view);
+        builder.setTitle("Enter your Task")
+                .setPositiveButton("SAVE",new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick (DialogInterface dialog,int which){
+                        addCard(name.getText().toString());
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        dialog = builder.create();
+    }
+    private void addCard(String name){
+        final View view = getLayoutInflater().inflate(R.layout.card,null);
+
+
+        TextView nameView = view.findViewById(R.id.name);
+        Button delete = view.findViewById(R.id.delete);
+        nameView.setText(name);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layout.removeView(view);
+            }
+        });
+        layout.addView(view);
+    }
+
+}
+
+//dialog.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+        <EditText
+            android:id="@+id/nameEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Task"
+            android:textSize="20dp"/>
+    </RelativeLayout>
+</RelativeLayout>
+
+//card.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="10dp">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textColor="#B95DE1"
+                    android:textFontWeight="1000"
+                    android:textSize="30dp"/>
+                <Button
+                    android:id="@+id/delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="Delete"
+                    android:layout_alignParentRight="true"/>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+</RelativeLayout>
